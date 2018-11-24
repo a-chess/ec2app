@@ -1,6 +1,7 @@
 version: 2
 jobs:
   build:
+    working_directory: ~/a-chess/ec2app
     docker:
       - image: circleci/ruby:2.5.1-node-browsers
         environment:
@@ -8,8 +9,6 @@ jobs:
       - image: mysql:5.7
         environment:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
-
-    working_directory: ~/a-chess/ec2app
 
     steps:
       - checkout
