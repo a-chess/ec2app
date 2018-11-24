@@ -23,11 +23,11 @@ jobs:
 
       - run: 
         name: bundle install
-          command: bundle install --jobs=4 --retry=3 --path vendor/bundle
+        command: bundle install --jobs=4 --retry=3 --path vendor/bundle
 
       - run: 
         name: yarn install
-          command: yarn install
+        command: yarn install
 
       - save_cache:
           key: app-{{ checksum "Gemfile.lock" }}-{{ checksum "yarn.lock" }}
