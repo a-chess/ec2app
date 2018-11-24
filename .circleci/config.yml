@@ -3,30 +3,30 @@ jobs:
   build:
     docker:
        - image: circleci/ruby:2.5.1-node-browsers
+       environment:
+          RAILS_ENV: test
+      - image: mysql:5.7
+        environment:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
 
     working_directory: ~/a-chess/ec2app
 
     steps:
       - checkout
 
-      - run:
-          name: Install sqlite
-          command: sudo apt-get update && sudo apt-get install -y libsqlite3-dev
-          
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "Gemfile.lock" }}
-            - v1-dependencies-
+            - app-{{ checksum "Gemfile.lock" }}
+            - app-
 
-      - run:
-          name: install dependencies
-          command: |
-            bundle install --jobs=4 --retry=3 --path vendor/bundle
+      - run: bundle install --jobs=4 --retry=3 --path vendor/bundle
+      - run: yarn install
 
       - save_cache:
+          key: app-{{ checksum "Gemfile.lock" }}-{{ checksum "yarn.lock" }}
           paths:
-            - ./vendor/bundle
-          key: v1-dependencies-{{ checksum "Gemfile.lock" }}
+            - vendor/bundle
+            - node_modules
         
       - run: bundle exec rake db:create db:migrate
       - deploy:
