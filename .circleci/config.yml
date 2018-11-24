@@ -1,0 +1,41 @@
+version: 2
+jobs:
+  build:
+    docker:
+       - image: circleci/ruby:2.5.1-node-browsers
+
+    working_directory: ~/a-chess/ec2app
+
+    steps:
+      - checkout
+
+      - run:
+          name: Install sqlite
+          command: sudo apt-get update && sudo apt-get install -y libsqlite3-dev
+          
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "Gemfile.lock" }}
+            - v1-dependencies-
+
+      - run:
+          name: install dependencies
+          command: |
+            bundle install --jobs=4 --retry=3 --path vendor/bundle
+
+      - save_cache:
+          paths:
+            - ./vendor/bundle
+          key: v1-dependencies-{{ checksum "Gemfile.lock" }}
+        
+      - run: bundle exec rake db:create db:migrate
+      - deploy:
+          name: Capistranoデプロイ
+          command: |
+            if [ "${CIRCLE_BRANCH}" != "master" ]; then
+              exit 0
+            fi
+            
+            bundle exec cap production deploy
+
+

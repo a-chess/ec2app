@@ -1,0 +1,21 @@
+default: &default
+  adapter: mysql2
+  encoding: utf8
+  username: <%= ENV['EC2APP_DB_USER'] || 'root' %>
+  password: <%= ENV['EC2APP_DB_PSWD'] %> 
+  host: <%= ENV['EC2APP_DB_HOST'] || 'localhost' %>
+  port: <%= ENV['EC2APP_DB_PORT'] || 3306 %>
+  pool: <%= ENV['RAILS_MAX_THREADS'] || 5 %>
+  timeout: 5000
+
+development:
+  <<: *default
+  database: ec2app_dev
+
+test:
+  <<: *default
+  database: ec2app_test
+
+production:
+  <<: *default
+  database: ec2app_prd
